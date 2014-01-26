@@ -46,8 +46,8 @@ public class WatchLink extends Service {
 	
 	public static final String EOS = "<!EOS!>";
 
-	public static final String DISMISS_INTENT = "com.hkthn.slidingwatchscreens.dismiss";
-	public static final String NOTIFICATION_INTENT = "com.hkthn.slidingwatchscreens.notification";
+	public static final String DISMISS_INTENT = "com.hkthn.watchoutserver.dismiss";
+	public static final String NOTIFICATION_INTENT = "com.hkthn.watchoutserver.notification";
 	public static final int NOTIFICATION_ID = 300;
 	public static final String UUID = "7bcc1440-858a-11e3-baa7-0800200c9a66"; 
 		
@@ -86,10 +86,14 @@ public class WatchLink extends Service {
 		br = new BroadcastReceiver(){
 			@Override
 			public void onReceive(Context context, Intent intent) {
+				log("Recieved new intent in BR");
 				if(intent.getAction().equals(NOTIFICATION_INTENT)){
 					log("Got notification request");
 					//Send to phone if possible
-				}
+					if(io != null){
+						io.write(intent.getStringExtra("toSend"));
+					}
+				} 
 			}
 		};
 		IntentFilter intf = new IntentFilter();
@@ -255,6 +259,15 @@ public class WatchLink extends Service {
 				
 				//Start recording
 				startRecording();
+			} else if (requestType.equals("DISMISS")){
+				log("Trying to dismiss");
+				String[] allData = requestData.split("\\|");
+				Intent i = new Intent();
+				i.setAction(DISMISS_INTENT);
+				i.putExtra("pkg", allData[0]);
+				i.putExtra("tag", allData[1]);
+				i.putExtra("id", allData[2]);
+				LocalBroadcastManager.getInstance(this).sendBroadcast(i);
 			}
 		} else {
 			log("Error! Improper formatting");

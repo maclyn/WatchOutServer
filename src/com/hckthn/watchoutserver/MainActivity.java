@@ -55,8 +55,10 @@ public class MainActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				Intent watchLink = new Intent(MainActivity.this, WatchLink.class);
+				Intent nl = new Intent(MainActivity.this, NotificationPusher.class);
 				if(!isStarted){
 					MainActivity.this.startService(watchLink);
+					MainActivity.this.startService(nl);
 					startService.setText("Stop Service");
 					isStarted = true;
 				} else {
